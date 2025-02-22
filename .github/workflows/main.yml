@@ -26,7 +26,7 @@ jobs:
 
       - name: Download regctl
         run: |
-          curl -L https://github.com/regclient/regclient/releases/download/v0.8.2/regbot-linux-amd64 -o regctl
+          curl -L https://github.com/regclient/regclient/releases/download/v0.8.2/regctl-linux-amd64 -o regctl
           chmod +x regctl
       - name: Log into Harbor
         env:
