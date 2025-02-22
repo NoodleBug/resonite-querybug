@@ -1,0 +1,39 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t harbor.noodlebug.network/resonite-querybug/querybug:latest .
+
+      - name: Save Docker image as tarball
+        run: docker harbor.noodlebug.network/resonite-querybug/querybug:latest >image.tar
+
+      - name: Download regctl
+        run: |
+          curl -L https://github.com/regclient/regclient/releases/download/v0.8.2/regbot-linux-amd64 -o regctl
+          chmod +x regctl
+      - name: Log into Harbor
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+        run: |
+          docker login harbor.noodlebug.network --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
+      - name: Push Docker image with regctl
+        run: |
+          ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:latest image.tar -v info
