@@ -22,7 +22,7 @@ jobs:
         run: docker build -t harbor.noodlebug.network/resonite-querybug/querybug:latest .
 
       - name: Save Docker image as tarball
-        run: docker harbor.noodlebug.network/resonite-querybug/querybug:latest >image.tar
+        run: docker save harbor.noodlebug.network/resonite-querybug/querybug:latest >image.tar
 
       - name: Download regctl
         run: |
