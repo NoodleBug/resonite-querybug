@@ -1,10 +1,13 @@
 import jq from "node-jq";
 import express from "express";
 const __dirname = new URL('.', import.meta.url).pathname;
+import path from "path";
 
 const app = express();
 
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
