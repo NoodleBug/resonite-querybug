@@ -36,5 +36,5 @@ jobs:
           docker login harbor.noodlebug.network --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
       - name: Push Docker image with regctl
         run: |
-          ./ regctl registry set --blob-chunk 20971520 --blob-max 104857600 harbor.noodlebug.network
+          ./regctl registry set --blob-chunk 20971520 --blob-max 104857600 harbor.noodlebug.network
           ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:latest image.tar -v info
