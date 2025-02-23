@@ -54,14 +54,18 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           IMAGE_NAME="harbor.noodlebug.network/resonite-querybug/querybug"
-          # Replace the image tag in kube.yaml
           sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-]*#${IMAGE_NAME}:${TAG}#g" kube.yaml
 
-      - name: Commit updated manifest
+      - name: Update package.json version
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          jq --arg ver "$VERSION" '.version = $ver' package.json > package.tmp && mv package.tmp package.json
+
+      - name: Commit updated manifest and package.json
+        run: |
           git config --global user.email "ci@example.com"
           git config --global user.name "GitHub Actions CI"
-          git add kube.yaml
-          git commit -m "Update image tag to ${TAG}" || echo "No changes to commit"
+          git add kube.yaml package.json
+          git commit -m "Update image tag to ${TAG} and package.json version to ${VERSION}" || echo "No changes to commit"
           git push
