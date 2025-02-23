@@ -16,10 +16,14 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Docker image
-        run: docker build -t harbor.noodlebug.network/resonite-querybug/querybug:latest .
+        run: | 
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          docker build -t harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA .
 
       - name: Save Docker image as tarball
-        run: docker save harbor.noodlebug.network/resonite-querybug/querybug:latest >image.tar
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          docker save harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA >image.tar
 
       - name: Download regctl
         run: |
@@ -33,5 +37,6 @@ jobs:
           docker login harbor.noodlebug.network --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
       - name: Push Docker image with regctl
         run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
           ./regctl registry set --blob-chunk 20971520 --blob-max 104857600 harbor.noodlebug.network
-          ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:latest image.tar -v info
+          ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA image.tar -v info
