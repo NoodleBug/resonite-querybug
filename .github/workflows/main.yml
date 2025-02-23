@@ -29,14 +29,32 @@ jobs:
         run: |
           curl -L https://github.com/regclient/regclient/releases/download/v0.8.2/regctl-linux-amd64 -o regctl
           chmod +x regctl
+
       - name: Log into Harbor
         env:
           HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
           HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
         run: |
           docker login harbor.noodlebug.network --username $HARBOR_USERNAME --password $HARBOR_PASSWORD
+
       - name: Push Docker image with regctl
         run: |
           SHORT_SHA="${GITHUB_SHA:0:7}"
           ./regctl registry set --blob-chunk 20971520 --blob-max 104857600 harbor.noodlebug.network
           ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA image.tar -v info
+
+      - name: Update kube.yaml with new image tag
+        run: |
+          IMAGE_TAG="${GITHUB_SHA:0:7}"
+          IMAGE_NAME="harbor.noodlebug.network/resonite-querybug/querybug"
+          
+          # Replace the image tag in kube.yaml
+          sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-]*#${IMAGE_NAME}:${IMAGE_TAG}#g" kube.yaml
+
+      - name: Commit updated manifest
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "GitHub Actions CI"
+          git add kube.yaml
+          git commit -m "Update image tag to ${GITHUB_SHA:0:7}" || echo "No changes to commit"
+          git push
