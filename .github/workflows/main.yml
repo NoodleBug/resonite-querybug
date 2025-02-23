@@ -19,13 +19,13 @@ jobs:
 
       - name: Build Docker image
         run: | 
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          docker build -t harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA .
+          TAG="${GITHUB_REF#refs/tags/}"
+          docker build -t harbor.noodlebug.network/resonite-querybug/querybug:$TAG .
 
       - name: Save Docker image as tarball
         run: |
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          docker save harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA >image.tar
+          TAG="${GITHUB_REF#refs/tags/}"
+          docker save harbor.noodlebug.network/resonite-querybug/querybug:$TAG > image.tar
 
       - name: Download regctl
         run: |
@@ -41,22 +41,27 @@ jobs:
 
       - name: Push Docker image with regctl
         run: |
-          SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG="${GITHUB_REF#refs/tags/}"
           ./regctl registry set --blob-chunk 20971520 --blob-max 104857600 harbor.noodlebug.network
-          ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:$SHORT_SHA image.tar -v info
+          ./regctl image import harbor.noodlebug.network/resonite-querybug/querybug:$TAG image.tar -v info
+
+      - name: Checkout main branch
+        run: |
+          git fetch origin main
+          git checkout main
 
       - name: Update kube.yaml with new image tag
         run: |
-          IMAGE_TAG="${GITHUB_SHA:0:7}"
+          TAG="${GITHUB_REF#refs/tags/}"
           IMAGE_NAME="harbor.noodlebug.network/resonite-querybug/querybug"
-          
           # Replace the image tag in kube.yaml
-          sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-]*#${IMAGE_NAME}:${IMAGE_TAG}#g" kube.yaml
+          sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-]*#${IMAGE_NAME}:${TAG}#g" kube.yaml
 
       - name: Commit updated manifest
         run: |
+          TAG="${GITHUB_REF#refs/tags/}"
           git config --global user.email "ci@example.com"
           git config --global user.name "GitHub Actions CI"
           git add kube.yaml
-          git commit -m "Update image tag to ${GITHUB_SHA:0:7}" || echo "No changes to commit"
+          git commit -m "Update image tag to ${TAG}" || echo "No changes to commit"
           git push
