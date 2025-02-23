@@ -17,7 +17,7 @@ spec:
         - name: regcred
       containers:
       - name: resonite-querybug
-        image: harbor.noodlebug.network/resonite-querybug/querybug:latest
+        image: harbor.noodlebug.network/resonite-querybug/querybug:d2bc97a
         ports:
         - containerPort: 8080
 ---
