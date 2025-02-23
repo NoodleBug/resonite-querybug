@@ -54,7 +54,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           IMAGE_NAME="harbor.noodlebug.network/resonite-querybug/querybug"
-          sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-]*#${IMAGE_NAME}:${TAG}#g" kube.yaml
+          sed -i "s#${IMAGE_NAME}:[a-zA-Z0-9_-\.]*#${IMAGE_NAME}:${TAG}#g" kube.yaml
 
       - name: Update package.json version
         run: |
