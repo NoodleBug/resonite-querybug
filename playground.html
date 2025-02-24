@@ -23,6 +23,7 @@
 				<span>
 					JSON
 					<button id="format-json-button" class="label-button">Format</button>
+					<button id="expand-json" class="label-button icon"></button>
 				</span>
 				<textarea id="jsonInput" placeholder="JSON Input"></textarea>
 			</label>
@@ -75,10 +76,12 @@
 			<div class="fullscreen-inspector-backdrop">
 				<div class="fullscreen-inspector">
 					<div class="inspector-header">
-						<div class="inspector-close">X</div>
+						<div>JSON</div>
+						<button id="format-expanded-json" class="label-button">Format</button>
+						<button id="expand-json-close" class="label-button icon">󰘕</button>
 					</div>
 					<div class="inspector-content">
-						<textarea class="inspector-input"></textarea>
+						<textarea placeholder="JSON Input" class="inspector-input"></textarea>
 					</div>
 				</div>
 			</div>
@@ -86,37 +89,5 @@
 		</form>
 		
 	</body>
-	<script>
-		document.getElementById('queryForm').addEventListener('submit', function(e) {
-			e.preventDefault();
-
-			const jqFilter = document.getElementById('jqFilter').value;
-			const jsonInput = document.getElementById('jsonInput').value;
-
-			fetch(`/?q=${encodeURIComponent(jqFilter)}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: jsonInput
-			})
-				.then(data => {
-					data.text().then(text => {
-						document.getElementById('output').innerText = text;
-					});
-				})
-				.catch(error => {
-					console.error(error)
-					document.getElementById('output').innerText = text;
-				});
-		});
-
-		document.getElementById('format-json-button').addEventListener('click', function(e) {
-			e.preventDefault();
-			const jsonInput = document.getElementById('jsonInput');
-			const formattedJson = JSON.stringify(JSON.parse(jsonInput.value), null, 2);
-			jsonInput.value = formattedJson;
-		});
-		
-	</script>
+	<script src="script.js"></script>
 </html>
