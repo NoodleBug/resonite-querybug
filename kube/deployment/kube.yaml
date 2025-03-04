@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resonite-querybug
+  namespace: resonite-querybug
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resonite-querybug
+  template:
+    metadata:
+      labels:
+        app: resonite-querybug
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: resonite-querybug
+        image: harbor.noodlebug.network/resonite-querybug/querybug:v0.0.6
+        ports:
+        - containerPort: 8080
