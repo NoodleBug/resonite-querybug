@@ -1,7 +1,10 @@
 
+const jqFilterInput = document.getElementById('jqFilter');
 const expandButton = document.getElementById('expand-json');
 const expandCloseButton = document.getElementById('expand-json-close');
 const jsonInput = document.getElementById('jsonInput');
+const inspectorBackdrop = document.querySelector('.fullscreen-inspector-backdrop');
+const inspector = document.querySelector('.fullscreen-inspector');
 const inspectorInput = document.querySelector('.inspector-input');
 
 
@@ -20,15 +23,28 @@ function formatJson(inputElement) {
 expandButton.addEventListener('click', function(e) {
 	e.preventDefault();
 	inspectorInput.value = jsonInput.value;
-	document.querySelector('.fullscreen-inspector-backdrop').style.display = 'block';
-	document.body.style.overflow = 'hidden';
+	inspectorBackdrop.style.display = 'block';
+	requestAnimationFrame(() => {
+		inspectorBackdrop.classList.add('open');
+		inspector.classList.add('open');
+		inspectorInput.focus();
+		document.body.style.overflow = 'hidden';
+	});
 });
 
 expandCloseButton.addEventListener('click', function(e) {
 	e.preventDefault();
 	jsonInput.value = inspectorInput.value;
-	document.querySelector('.fullscreen-inspector-backdrop').style.display = 'none';
-	document.body.style.overflow = 'auto';
+	inspector.classList.remove('open');
+	inspector.classList.add('close');
+	inspectorBackdrop.classList.remove('open');
+	inspectorBackdrop.classList.add('close');
+	setTimeout(() => {
+		inspectorBackdrop.style.display = 'none';
+		document.body.style.overflow = 'auto';
+		inspector.classList.remove('close');
+		inspectorBackdrop.classList.remove('close');
+	}, 100);
 });
 
 document.getElementById('queryForm').addEventListener('submit', function(e) {
